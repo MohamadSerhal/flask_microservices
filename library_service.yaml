@@ -185,13 +185,53 @@ paths:
                   $ref: '#/components/schemas/Book'
         '400':
           $ref: "#/components/responses/400"
-  # /borrow/{book_name}: # user borrows a book
-  #   get: # returns info on the borrowing of the book (if borrowed)
-  #   delete: # delete borrowed entry
-
-  # /borrow/add:
-  #   post: # add a borrowing entry
-
-
-    
-        
+  /borrow/{book_name}: # user borrows a book / returns it
+    parameters:
+    - $ref: "#/components/parameters/BookName"
+    get: # returns info on the borrowing of the book (if borrowed)
+      description: Returns info on the borrowing of the book (if borrowed)
+      operationId: get_borrowed_book
+      tags:
+      - borrowed
+      responses:
+        '200':
+          description: Returned borrowed book status successfully
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Borrow_book'
+        '400':
+          $ref: "#/components/responses/400"
+    delete: # delete borrowed entry
+      description: Deletes the borrowed book entry.
+      operationId: remove_borrowed_book
+      tags:
+      - borrowed
+      security: # auth header
+        - jwtAuth: []
+      responses:
+        '200':
+          $ref: "#/components/responses/200"
+        '400':
+          $ref: "#/components/responses/400"
+  /borrow/add:
+    post: # add a borrowing entry
+      description: Borrow a book from the library
+      operationId: borrow_book
+      tags:
+      - borrowed
+      requestBody:
+        required: true
+        content: 
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Borrow_book"
+      security: # auth header
+        - jwtAuth: []
+      responses:
+        '201':
+          $ref: "#/components/responses/200"
+        '400':
+          $ref: "#/components/responses/400"
