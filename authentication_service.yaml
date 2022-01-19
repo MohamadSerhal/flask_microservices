@@ -1,0 +1,102 @@
+openapi: 3.0.2
+info:
+  title: Authentication API
+  description: 'API for user registration and login. Used for authentication and the generation of auth tokens.'
+  version: 0.0.1
+servers:
+  - url: http://localhost:2000/
+    description: Authentication API Service
+
+components:
+  schemas:
+    userLoginBody:
+      required:
+      - username
+      - password
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+    userRegisterBody:
+      required:
+      - username
+      - password
+      - type
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+        full_name:
+          type: string
+        type:
+          type: string
+    inline_response_400:
+      type: object
+      properties:
+        message:
+          type: string
+    inline_response_200:
+      type: object
+      properties:
+        message:
+          type: string
+
+  responses:
+    "200":
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/inline_response_200'
+    "201":
+      description: Object created and added successfully to the DB
+    "400":
+      description: Invalid request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/inline_response_400'
+    "403":
+      description: Unauthorized functionnality
+
+paths:
+  /user/login:  # POST: user login and authentication
+    post:
+      description: login user and returns a json web token
+      operationId: login_user
+      tags:
+      - user
+      requestBody:
+        required: true
+        content: 
+          application/json:
+            schema:
+              $ref: "#/components/schemas/userLoginBody"
+      responses:
+        '200':
+          $ref: "#/components/responses/200"
+        '400':
+          $ref: "#/components/responses/403"
+        '403':
+          $ref: "#/components/responses/500"
+  /user/register:  # POST: user to register for app
+    post:
+      description: register user to the app
+      operationId: register_user
+      tags:
+      - user
+      requestBody:
+        required: true
+        content: 
+          application/json:
+            schema:
+              $ref: "#/components/schemas/userRegisterBody"
+      responses:
+        '201':
+          $ref: "#/components/responses/200"
+        '400':
+          $ref: "#/components/responses/500"
