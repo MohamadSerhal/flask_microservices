@@ -69,7 +69,7 @@ paths:
       description: login user and returns a json web token
       operationId: login_user
       tags:
-      - user
+      - authentication
       requestBody:
         required: true
         content: 
@@ -80,15 +80,15 @@ paths:
         '200':
           $ref: "#/components/responses/200"
         '400':
-          $ref: "#/components/responses/403"
+          $ref: "#/components/responses/400"
         '403':
-          $ref: "#/components/responses/500"
+          $ref: "#/components/responses/403"
   /user/register:  # POST: user to register for app
     post:
       description: register user to the app
       operationId: register_user
       tags:
-      - user
+      - authentication
       requestBody:
         required: true
         content: 
@@ -99,4 +99,4 @@ paths:
         '201':
           $ref: "#/components/responses/200"
         '400':
-          $ref: "#/components/responses/500"
+          $ref: "#/components/responses/400"
