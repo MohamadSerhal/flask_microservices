@@ -235,3 +235,20 @@ paths:
           $ref: "#/components/responses/200"
         '400':
           $ref: "#/components/responses/400"
+  /borrow: 
+    get:
+      description: get the books that have been borrowed with pagination.
+      operationId: get_borrowed_list
+      tags:
+      - borrowed
+      responses:
+        '200':
+          description: Returned borrowed books successfully
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Borrow_book'
+        '400':
+          $ref: "#/components/responses/400"

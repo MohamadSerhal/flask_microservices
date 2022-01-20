@@ -1,0 +1,112 @@
+openapi: 3.0.2
+info:
+  title: Contactor service API
+  description: 'API for the contactor that will contact people with borrowed late books.'
+  version: 0.0.1
+servers:
+  - url: http://localhost:2002/
+    description: Contactor Service API
+
+
+components:
+  schemas:
+    late_borrowers:
+      required:
+      - borrower
+      - late
+      type: object
+      properties:
+        borrower:
+          type: string
+        late:
+          type: array
+          items:
+            type: object
+            properties:
+              book:
+                type: string
+              date_of_return:
+                type: string
+                format: date
+                pattern: /([0-9]{4})-(?:[0-9]{2})-([0-9]{2})/
+                example: "2019-05-17"
+    inline_response_400:
+      type: object
+      properties:
+        message:
+          type: string
+    inline_response_200:
+      type: object
+      properties:
+        message:
+          type: string
+  
+  responses:
+    "200":
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/inline_response_200'
+    "201":
+      description: Entries created and added successfully to the DB
+    "400":
+      description: Invalid request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/inline_response_400'
+
+  parameters:
+    PageLimit:
+      name: limit
+      in: query
+      description: Limits the number of items on a page
+      required: false
+      style: form
+      explode: true
+      schema:
+        type: integer
+    PageOffset:
+      name: offset
+      in: query
+      description: Specifies the page number of the items to be displayed
+      required: false
+      style: form
+      explode: true
+      schema:
+        type: integer
+    
+
+paths:
+  /contact/update:  # get usernames and books of people that are late
+    patch:
+      description: updates the DB and fills it with the usernames of poeple who are late in returning their books
+      operationId: update_db
+      tags:
+      - contact
+      responses:
+        '200':
+          $ref: "#/components/responses/200"
+        '400':
+          $ref: "#/components/responses/400"
+  /contact: 
+    get: 
+      description: Get the usernames and books of people that are late + pagination.
+      operationId: get_late
+      tags:
+      - contact
+      parameters:
+      - $ref: "#/components/parameters/PageLimit"
+      - $ref: "#/components/parameters/PageOffset"
+      responses:
+        '200':
+          description: Returned borrowed books successfully
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/late_borrowers'
+        '400':
+          $ref: "#/components/responses/400"

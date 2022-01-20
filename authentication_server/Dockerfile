@@ -1,5 +1,10 @@
 FROM python:3-alpine
 
+RUN apk update && apk upgrade
+RUN apk add --no-cache gcc\
+                       musl-dev\
+                       libffi-dev
+
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
 
@@ -9,7 +14,7 @@ RUN pip3 install --no-cache-dir -r requirements.txt
 
 COPY . /usr/src/app
 
-EXPOSE 8080
+EXPOSE 2000
 
 ENTRYPOINT ["python3"]
 
