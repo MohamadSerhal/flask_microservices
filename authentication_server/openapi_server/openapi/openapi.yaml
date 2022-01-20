@@ -1,0 +1,132 @@
+openapi: 3.0.2
+info:
+  description: API for user registration and login. Used for authentication and the
+    generation of auth tokens.
+  title: Authentication API
+  version: 0.0.1
+servers:
+- description: Authentication API Service
+  url: http://localhost:2000/
+paths:
+  /user/login:
+    post:
+      description: login user and returns a json web token
+      operationId: login_user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/userLoginBody'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200'
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_400'
+          description: Invalid request
+        "403":
+          description: Unauthorized functionnality
+      tags:
+      - authentication
+      x-openapi-router-controller: openapi_server.controllers.authentication_controller
+  /user/register:
+    post:
+      description: register user to the app
+      operationId: register_user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/userRegisterBody'
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200'
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_400'
+          description: Invalid request
+      tags:
+      - authentication
+      x-openapi-router-controller: openapi_server.controllers.authentication_controller
+components:
+  responses:
+    "200":
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/inline_response_200'
+      description: OK
+    "201":
+      description: Object created and added successfully to the DB
+    "400":
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/inline_response_400'
+      description: Invalid request
+    "403":
+      description: Unauthorized functionnality
+  schemas:
+    userLoginBody:
+      properties:
+        username:
+          title: username
+          type: string
+        password:
+          title: password
+          type: string
+      required:
+      - password
+      - username
+      title: userLoginBody
+      type: object
+    userRegisterBody:
+      properties:
+        username:
+          title: username
+          type: string
+        password:
+          title: password
+          type: string
+        full_name:
+          title: full_name
+          type: string
+        type:
+          title: type
+          type: string
+      required:
+      - password
+      - type
+      - username
+      title: userRegisterBody
+      type: object
+    inline_response_400:
+      properties:
+        message:
+          title: message
+          type: string
+      title: inline_response_400
+      type: object
+    inline_response_200:
+      example:
+        message: message
+      properties:
+        message:
+          title: message
+          type: string
+      title: inline_response_200
+      type: object
