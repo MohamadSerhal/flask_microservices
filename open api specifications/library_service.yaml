@@ -30,7 +30,7 @@ components:
         date_of_release:
           type: string
           format: date
-          pattern: /([0-9]{4})-(?:[0-9]{2})-([0-9]{2})/
+          pattern: "([0-9]{4})-(?:[0-9]{2})-([0-9]{2})"
           example: "2019-05-17"
     Borrow_book:
       required:
@@ -47,12 +47,12 @@ components:
         borrowed_date:
           type: string
           format: date
-          pattern: /([0-9]{4})-(?:[0-9]{2})-([0-9]{2})/
+          pattern: "([0-9]{4})-(?:[0-9]{2})-([0-9]{2})"
           example: "2019-05-17"
         return_date:
           type: string
           format: date
-          pattern: /([0-9]{4})-(?:[0-9]{2})-([0-9]{2})/
+          pattern: "([0-9]{4})-(?:[0-9]{2})-([0-9]{2})"
           example: "2019-05-17"
     inline_response_400:
       type: object
