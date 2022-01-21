@@ -1,0 +1,372 @@
+openapi: 3.0.2
+info:
+  description: API used to add, remove and get books from the library. Also to manage
+    who has which book in their position and when they should be returned.
+  title: Library service API
+  version: 0.0.1
+servers:
+- description: Library API Service
+  url: http://localhost:2001/
+paths:
+  /book/add:
+    post:
+      description: Add a book to the library
+      operationId: add_book
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Book'
+        required: true
+      responses:
+        "201":
+          description: Book created and added successfully to the DB
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_400'
+          description: Invalid request
+      security:
+      - jwtAuth: []
+      tags:
+      - books
+      x-openapi-router-controller: openapi_server.controllers.books_controller
+  /book/{book_name}:
+    delete:
+      description: Delete book from the library database
+      operationId: delete_book
+      parameters:
+      - explode: false
+        in: path
+        name: book_name
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200'
+          description: OK
+        "403":
+          description: Unauthorized functionnality
+      security:
+      - jwtAuth: []
+      tags:
+      - books
+      x-openapi-router-controller: openapi_server.controllers.books_controller
+    get:
+      description: get a book from the library database
+      operationId: get_book
+      parameters:
+      - explode: false
+        in: path
+        name: book_name
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200'
+          description: OK
+        "404":
+          description: Book not found
+      tags:
+      - books
+      x-openapi-router-controller: openapi_server.controllers.books_controller
+  /books:
+    get:
+      description: Gets a list of books in alphabetical order
+      operationId: get_books_list
+      parameters:
+      - description: Limits the number of items on a page
+        explode: true
+        in: query
+        name: limit
+        required: false
+        schema:
+          type: integer
+        style: form
+      - description: Specifies the page number of the items to be displayed
+        explode: true
+        in: query
+        name: offset
+        required: false
+        schema:
+          type: integer
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Book'
+                type: array
+          description: Returned books successfully
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_400'
+          description: Invalid request
+      tags:
+      - books
+      x-openapi-router-controller: openapi_server.controllers.books_controller
+  /borrow:
+    get:
+      description: get the books that have been borrowed with pagination.
+      operationId: get_borrowed_list
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Borrow_book'
+                type: array
+          description: Returned borrowed books successfully
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_400'
+          description: Invalid request
+      tags:
+      - borrowed
+      x-openapi-router-controller: openapi_server.controllers.borrowed_controller
+  /borrow/add:
+    post:
+      description: Borrow a book from the library
+      operationId: borrow_book
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Borrow_book'
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200'
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_400'
+          description: Invalid request
+      security:
+      - jwtAuth: []
+      tags:
+      - borrowed
+      x-openapi-router-controller: openapi_server.controllers.borrowed_controller
+  /borrow/{book_name}:
+    delete:
+      description: Deletes the borrowed book entry.
+      operationId: remove_borrowed_book
+      parameters:
+      - explode: false
+        in: path
+        name: book_name
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200'
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_400'
+          description: Invalid request
+      security:
+      - jwtAuth: []
+      tags:
+      - borrowed
+      x-openapi-router-controller: openapi_server.controllers.borrowed_controller
+    get:
+      description: Returns info on the borrowing of the book (if borrowed)
+      operationId: get_borrowed_book
+      parameters:
+      - explode: false
+        in: path
+        name: book_name
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Borrow_book'
+                type: array
+          description: Returned borrowed book status successfully
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_400'
+          description: Invalid request
+      tags:
+      - borrowed
+      x-openapi-router-controller: openapi_server.controllers.borrowed_controller
+components:
+  parameters:
+    PageLimit:
+      description: Limits the number of items on a page
+      explode: true
+      in: query
+      name: limit
+      required: false
+      schema:
+        type: integer
+      style: form
+    PageOffset:
+      description: Specifies the page number of the items to be displayed
+      explode: true
+      in: query
+      name: offset
+      required: false
+      schema:
+        type: integer
+      style: form
+    BookName:
+      explode: false
+      in: path
+      name: book_name
+      required: true
+      schema:
+        type: string
+      style: simple
+  responses:
+    "200":
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/inline_response_200'
+      description: OK
+    "201":
+      description: Book created and added successfully to the DB
+    "400":
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/inline_response_400'
+      description: Invalid request
+    "403":
+      description: Unauthorized functionnality
+    "404":
+      description: Book not found
+  schemas:
+    Book:
+      example:
+        name: name
+        genre: genre
+        publisher: publisher
+        description: description
+        authors:
+        - authors
+        - authors
+        date_of_release: 2019-05-17T00:00:00.000+0000
+      properties:
+        name:
+          title: name
+          type: string
+        authors:
+          items:
+            type: string
+          title: authors
+          type: array
+        publisher:
+          title: publisher
+          type: string
+        genre:
+          title: genre
+          type: string
+        description:
+          title: description
+          type: string
+        date_of_release:
+          example: 2019-05-17
+          format: date
+          pattern: /([0-9]{4})-(?:[0-9]{2})-([0-9]{2})/
+          title: date_of_release
+          type: string
+      required:
+      - authors
+      - name
+      title: Book
+      type: object
+    Borrow_book:
+      example:
+        book: book
+        borrower: borrower
+        borrowed_date: 2019-05-17T00:00:00.000+0000
+        return_date: 2019-05-17T00:00:00.000+0000
+      properties:
+        borrower:
+          title: borrower
+          type: string
+        book:
+          title: book
+          type: string
+        borrowed_date:
+          example: 2019-05-17
+          format: date
+          pattern: /([0-9]{4})-(?:[0-9]{2})-([0-9]{2})/
+          title: borrowed_date
+          type: string
+        return_date:
+          example: 2019-05-17
+          format: date
+          pattern: /([0-9]{4})-(?:[0-9]{2})-([0-9]{2})/
+          title: return_date
+          type: string
+      required:
+      - book
+      - borrowed_date
+      - borrower
+      - return_date
+      title: Borrow_book
+      type: object
+    inline_response_400:
+      properties:
+        message:
+          title: message
+          type: string
+      title: inline_response_400
+      type: object
+    inline_response_200:
+      example:
+        message: message
+      properties:
+        message:
+          title: message
+          type: string
+      title: inline_response_200
+      type: object
+  securitySchemes:
+    jwtAuth:
+      bearerFormat: JWT
+      scheme: bearer
+      type: http
+      x-bearerInfoFunc: openapi_server.controllers.security_controller_.info_from_jwtAuth
