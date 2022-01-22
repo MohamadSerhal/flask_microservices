@@ -1,0 +1,159 @@
+openapi: 3.0.2
+info:
+  description: API for the contactor that will contact people with borrowed late books.
+  title: Contactor service API
+  version: 0.0.1
+servers:
+- description: Contactor Service API
+  url: http://localhost:2002/
+paths:
+  /contact:
+    get:
+      description: Get the usernames and books of people that are late + pagination.
+      operationId: get_late
+      parameters:
+      - description: Limits the number of items on a page
+        explode: true
+        in: query
+        name: limit
+        required: false
+        schema:
+          type: integer
+        style: form
+      - description: Specifies the page number of the items to be displayed
+        explode: true
+        in: query
+        name: offset
+        required: false
+        schema:
+          type: integer
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/late_borrowers'
+                type: array
+          description: Returned borrowed books successfully
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_400'
+          description: Invalid request
+      tags:
+      - contact
+      x-openapi-router-controller: openapi_server.controllers.contact_controller
+  /contact/update:
+    patch:
+      description: updates the DB and fills it with the usernames of poeple who are
+        late in returning their books
+      operationId: update_db
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200'
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_400'
+          description: Invalid request
+      tags:
+      - contact
+      x-openapi-router-controller: openapi_server.controllers.contact_controller
+components:
+  parameters:
+    PageLimit:
+      description: Limits the number of items on a page
+      explode: true
+      in: query
+      name: limit
+      required: false
+      schema:
+        type: integer
+      style: form
+    PageOffset:
+      description: Specifies the page number of the items to be displayed
+      explode: true
+      in: query
+      name: offset
+      required: false
+      schema:
+        type: integer
+      style: form
+  responses:
+    "200":
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/inline_response_200'
+      description: OK
+    "201":
+      description: Entries created and added successfully to the DB
+    "400":
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/inline_response_400'
+      description: Invalid request
+  schemas:
+    late_borrowers:
+      example:
+        late:
+        - date_of_return: 2019-05-17T00:00:00.000+0000
+          book: book
+        - date_of_return: 2019-05-17T00:00:00.000+0000
+          book: book
+        borrower: borrower
+      properties:
+        borrower:
+          title: borrower
+          type: string
+        late:
+          items:
+            $ref: '#/components/schemas/late_borrowers_late'
+          title: late
+          type: array
+      required:
+      - borrower
+      - late
+      title: late_borrowers
+      type: object
+    inline_response_400:
+      properties:
+        message:
+          title: message
+          type: string
+      title: inline_response_400
+      type: object
+    inline_response_200:
+      example:
+        message: message
+      properties:
+        message:
+          title: message
+          type: string
+      title: inline_response_200
+      type: object
+    late_borrowers_late:
+      example:
+        date_of_return: 2019-05-17T00:00:00.000+0000
+        book: book
+      properties:
+        book:
+          title: book
+          type: string
+        date_of_return:
+          example: 2019-05-17
+          format: date
+          pattern: ([0-9]{4})-(?:[0-9]{2})-([0-9]{2})
+          title: date_of_return
+          type: string
+      title: late_borrowers_late
+      type: object
